@@ -1,11 +1,8 @@
 # Projects
 
-This section documents my implementations of data structures.
+This section documents my data science projects, research questions, and data stories I create throughout the semesters.
 
 ---
 
-## Binary Search Trees
-
-Implementation and analysis of BST operations.
-
+## Project 1
 Coming soon.
