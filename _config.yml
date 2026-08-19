@@ -1,4 +1,11 @@
 title: Data Science Portfolio
-description: Documenting my learning in Data Structures
+description: Documenting my learning in Data Science
 theme: jekyll-theme-minimal
+logo: profile.png
+author: Monica Mawi
 show_downloads: false
+github:
+  is_project_page: false
+social_links:
+  github: https://github.com/monicarem
+  linkedin: https://www.linkedin.com/in/monica-mawi-738713283/
