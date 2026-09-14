@@ -2,6 +2,7 @@
 Data Science Student  
 UNC Charlotte
 
+[📄 Download My Resume](Monica_Mawi_Resume.pdf) | [LinkedIn](https://www.linkedin.com/in/monica-mawi-738713283/)
 ---
 
 ## About Me
