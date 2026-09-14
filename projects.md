@@ -44,10 +44,24 @@ Obesity and diabetes are major public health concerns in the United States, and 
 Fast food density actually shows a weak correlation with obesity and diabetes. Counties with more fast food per capita tend to be slightly healthier. Poverty and income, on the other hand, show much stronger relationships with health outcomes. Poverty rate alone correlates at 0.737 with diabetes.
 
 ### Visualizations
+
+**Chart 1: Fast Food Density vs. Adult Obesity Rate**
+
 <img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/4f61efea-bc9d-4dda-9570-f0f2632ef268" />
+This scatter plot shows the weak negative relationship between fast food density and obesity. The downward trend line suggests that fast food density alone does not explain obesity patterns.
+
+**Chart 2: Poverty Rate vs. Adult Obesity Rate**
+
+<img width="990" height="590" alt="image" src="https://github.com/user-attachments/assets/2081f0b9-2a43-41e0-8ec8-8ca7f5d2e29e" />
+This scatter plot shows the much stronger positive relationship between poverty and obesity. The upward trend is clear and consistent across counties.
 
 ### Ethics and Limitations
 
+- **Ecological fallacy**: County-level data cannot tell us about individual behavior. A county with high fast food density is not necessarily one where residents eat more fast food.
+- **Missing data**: 675 counties were dropped due to missing values, which may bias results toward counties with more complete reporting.
+- **Confounding**: Fast food density correlates with urbanization and income, which are independently linked to health.
+- **Causality**: This analysis shows correlation only. It does not prove that fast food causes or prevents obesity.
+- **Data vintage**: Fast food data is from 2020, health data from 2023, and income data from 2021. Relationships may have shifted since.
 
 ### AI Usage Disclosure
 
