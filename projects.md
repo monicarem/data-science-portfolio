@@ -16,12 +16,13 @@ Obesity and diabetes are major public health concerns in the United States, and 
 
 ### Variables
 
-Variable | Source | Role
-Fast food restaurant per 1,000 people | USDA | Independent
-Obesity Prevalence | CDC | Dependent
-Diabetes Prevalence | CDC | Dependent
-Median Household Income | USDA | Control
-Poverty Rate | USDA | Control
+| Variable | Source | Role |
+|----------|--------|------|
+| Fast food restaurant per 1,000 people | USDA | Independent |
+| Obesity Prevalence | CDC | Dependent |
+| Diabetes Prevalence | CDC | Dependent |
+| Median Household Income | USDA | Control |
+| Poverty Rate | USDA | Control |
 
 ## Data Cleaning
 
