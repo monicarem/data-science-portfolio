@@ -66,7 +66,7 @@ This scatter plot shows the much stronger positive relationship between poverty 
 
 ### Code
 
-Full notebook available here: 
+Full notebook available here: health analysis.ipynb
 
 ### AI Usage Disclosure
 
