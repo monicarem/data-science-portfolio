@@ -6,7 +6,6 @@ author: Monica Mawi
 show_downloads: false
 github:
   is_project_page: false
-social_links:
-  github: https://github.com/monicarem
-  - https://monicarem.github.io/data-science-portfolio
-  linkedin: https://www.linkedin.com/in/monica-mawi-738713283/
+  owner_url: https://github.com/monicarem
+  owner_name: monicarem
+linkedin_url: https://www.linkedin.com/in/monica-mawi-738713283/
