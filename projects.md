@@ -1,6 +1,6 @@
 # Projects
 
-Coming soon! I will be adding my data science projects here throughout the semester.
+I will be adding my data science projects here throughout the semester.
 
 ---
 
@@ -63,6 +63,10 @@ This scatter plot shows the much stronger positive relationship between poverty 
 - **Confounding**: Fast food density correlates with urbanization and income, which are independently linked to health.
 - **Causality**: This analysis shows correlation only. It does not prove that fast food causes or prevents obesity.
 - **Data vintage**: Fast food data is from 2020, health data from 2023, and income data from 2021. Relationships may have shifted since.
+
+### Code
+
+Full notebook available here: 
 
 ### AI Usage Disclosure
 
