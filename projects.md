@@ -33,17 +33,18 @@ Obesity and diabetes are major public health concerns in the United States, and 
 
 ## Key Findings
 
-Relationship | Correlation
-
-Fast food density vs. obesity | -0.199
-Poverty rate vs. obesity | 0.491
-Median income vs. obesity | -0.586
-Fast food density vs. diabetes | -0.127
-Poverty rates vs. diabetes | 0.737
+| Relationship | Correlation |
+|--------------|-------------|
+| Fast food density vs. obesity | -0.199 |
+| Poverty rate vs. obesity | 0.491 |
+| Median income vs. obesity | -0.586 |
+| Fast food density vs. diabetes | -0.127 |
+| Poverty rates vs. diabetes | 0.737 |
 
 Fast food density actually shows a weak correlation with obesity and diabetes. Counties with more fast food per capita tend to be slightly healthier. Poverty and income, on the other hand, show much stronger relationships with health outcomes. Poverty rate alone correlates at 0.737 with diabetes.
 
 ### Visualizations
+<img width="989" height="590" alt="image" src="https://github.com/user-attachments/assets/4f61efea-bc9d-4dda-9570-f0f2632ef268" />
 
 ### Ethics and Limitations
 
