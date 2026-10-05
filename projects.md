@@ -71,3 +71,108 @@ Full notebook available here: health analysis.ipynb
 ### AI Usage Disclosure
 
 AI tools were used to assist with debugging API calls, cleaning code structure, and providing feedback on the write-up. All analysis, interpretation, and final code decisions were made by the author.
+
+## Project 2: Predicting High-Obesity Counties from Food Environment and Socioeconomic Data
+
+## Research Question
+
+Can we predict whether a U.S. county has above-median adult obesity prevalence using food environment, income, poverty, and health data?
+
+## Problem Definition
+
+**Prediction Problem:** Predicting whether a U.S. county will fall into the high-obesity category, meaning its adult obesity rate is above the national median, based on food environment, socioeconomic, and health-related features from public county-level datasets.
+
+**Target Variable:** `High_Obesity`. This is a binary variable where 1 means the county's adult obesity prevalence is above 38.0%, and 0 means it is at or below 38.0%. The 38.0% cutoff comes from the median of the CDC PLACES crude obesity prevalence values after cleaning the data.
+
+**Problem Type:** Classification. The target variable has two possible outcomes, high obesity or not high obesity. Because of this, I will use classification models such as logistic regression, decision trees, and ensemble methods. I will evaluate the models using accuracy, precision, recall, F1, and ROC-AUC.
+
+**Who Benefits:**
+- County and state public health departments deciding where to focus obesity prevention and nutrition programs
+- Community health centers and nonprofits working on food access and health programs
+- Healthcare systems planning for chronic disease care in different regions
+- Policymakers deciding whether socioeconomic factors or the food environment should be considered when planning interventions
+
+**Why It Matters:** Adult obesity affects more than 40% of U.S. adults and is linked to diabetes, heart disease, and other health problems. These conditions also create high healthcare costs. Obesity rates are not the same across all counties, and some areas have much higher rates than others. Since public health resources are limited, being able to identify counties that may have higher obesity rates could help health departments decide where to focus their resources.
+
+Project 1 showed that socioeconomic factors had stronger relationships with obesity than fast food density. Poverty had a correlation of r = 0.491, while median income had a correlation of r = -0.586. Fast food density had a much weaker correlation of r = -0.199. This project builds on those findings by moving from looking at relationships to making predictions. Instead of only asking whether obesity is related to poverty, I want to see whether a county's food environment, income, poverty, and diabetes prevalence can predict whether it falls into the high-obesity group. If the model performs well, it could help identify counties that may need more attention. If it does not perform well, or if diabetes is the main feature driving the predictions, that can also show the limits of using county-level data to predict obesity.
+
+### Background and Context
+
+Obesity is one of the major public health challenges in the United States. According to the National Center for Health Statistics, 40.3% of U.S. adults were classified as obese during the 2021–2023 period, while another 9.4% were classified as severely obese (Emmerich et al., 2024). Obesity can also increase the risk of health problems such as type 2 diabetes, cardiovascular disease, hypertension, and several types of cancer. The healthcare costs related to obesity are also high. Adults with obesity-related multimorbidity have higher healthcare use and costs, with costs that are 151% to 264% higher than for adults without these conditions (Ezendu et al., 2025). These costs also vary across the country. Obesity rates can differ based on factors such as location, income, and access to healthy food, which makes county-level prediction useful for understanding where obesity rates may be higher.
+
+Previous research has looked at why obesity rates are higher in some areas than others. One recent study of more than 3,000 U.S. counties found that food insecurity, poverty, unemployment, limited access to healthy food retailers, and higher densities of fast-food and convenience stores were associated with higher adult obesity rates (Abraham et al., 2026). The study also found that higher median household income and greater access to recreational facilities were associated with lower obesity rates (Abraham et al., 2026). These findings are similar to what Project 1 found at the bivariate level. Across 2,468 counties, poverty had a correlation of r = 0.491 with obesity, while median income had a correlation of r = -0.586. Fast-food density had a weaker relationship with obesity, with a correlation of r = -0.199. This suggests that socioeconomic factors may be more useful for predicting obesity than food environment variables alone. This is something that can be tested further with a machine learning model.
+
+The main focus of this project is to move from describing relationships to making predictions. Previous research has mostly focused on identifying factors that are associated with obesity. This project looks at whether those same factors can predict which counties will fall into the high-obesity category. It also tests whether adding diabetes prevalence improves the model's predictions. To do this, the project compares a model that uses food environment and socioeconomic features with a model that also includes diabetes prevalence. This can help show whether structural factors or health-related factors are more useful for predicting county-level obesity.
+
+### References
+
+Emmerich SD, Fryar CD, Stierman B, Ogden CL. Obesity and severe obesity prevalence in adults: United States, August 2021–August 2023. NCHS Data Brief, no 508. Hyattsville, MD: National Center for Health Statistics. 2024. DOI: https://dx.doi.org/10.15620/cdc/159281
+Abraham, A. M., Swartz, M. D., van den Berg, A. E., & Linder, S. H. (2026). Multilevel Analysis of the Food and Physical Activity Environment and Adult Obesity Across U.S. Counties and States. International journal of environmental research and public health, 23(2), 142. https://doi.org/10.3390/ijerph23020142Ezendu, K., Pohl, G., Lee, C. J., Wang, H., Li, X., & Dunn, J. P. (2025). Prevalence of obesity-related multimorbidity and its health care costs among adults in the United States. Journal of managed care & specialty pharmacy, 31(2), 179–188. https://doi.org/10.18553/jmcp.2025.31.2.179
+
+## Data Description
+
+This project uses data from two public sources: the USDA Food Environment Atlas and the CDC PLACES program. Both are free, county-level datasets that are commonly used in public health research.
+
+### USDA Food Environment Atlas
+
+The USDA Food Environment Atlas has county-level data on food access, restaurants, and socioeconomic conditions. I used two sheets from the 2025 release:
+
+- **RESTAURANTS** — fast food restaurants per 1,000 people (`FFRPTH20`, from 2020)
+- **SOCIOECONOMIC** — median household income (`MEDHHINC21`, from 2021) and poverty rate (`POVRATE21`, from 2021)
+
+Each sheet has about 3,144 rows — one per U.S. county. One thing to note: the first row in each sheet is a label row, not column names, so I had to load the files with `header=1`.
+
+**Source:** U.S. Department of Agriculture Economic Research Service. (2025). *Food Environment Atlas*. https://www.ers.usda.gov/data-products/food-environment-atlas/
+
+### CDC PLACES
+
+The CDC PLACES program provides county-level estimates of chronic disease prevalence, based on the BRFSS survey. I pulled two measures live from the Socrata API at `data.cdc.gov` (dataset ID `swc5-untb`):
+
+- **OBESITY** — adult obesity crude prevalence (`CDC_OBESITY`, from 2023)
+- **DIABETES** — adult diabetes crude prevalence (`CDC_DIABETES`, from 2023)
+
+I kept only crude prevalence values (not age-adjusted) so I wasn't mixing two different types of estimates. The API returned about 5,900 records per measure, all from the 2023 release.
+
+**Source:** Centers for Disease Control and Prevention. (2023). *PLACES: Local data for better health*. U.S. Department of Health and Human Services. https://www.cdc.gov/places
+
+### Rows, Size, and Merge
+
+Each row in the final dataset is **one U.S. county**. I merged the USDA and CDC data on the **5-digit FIPS county code**.
+
+After cleaning, the final dataset has **2,468 counties and 8 columns**:
+
+| Column | Description | Role |
+|---|---|---|
+| `FIPS` | 5-digit county code | Key |
+| `State` | State abbreviation | Identifier |
+| `County` | County name | Identifier |
+| `FFRPTH20` | Fast food restaurants per 1,000 people (2020) | Feature |
+| `MEDHHINC21` | Median household income (2021) | Feature |
+| `POVRATE21` | Poverty rate (2021) | Feature |
+| `CDC_OBESITY` | Adult obesity rate, % (2023) | **Target** |
+| `CDC_DIABETES` | Adult diabetes rate, % (2023) | Feature (Model 2 only) |
+
+### Missing Data
+
+Both sources use `-8888` and `-9999` as missing-value codes. I replaced those with `NaN` and dropped any row with missing values. That dropped the dataset from 3,144 counties down to 2,468 — about 78.5% of U.S. counties.
+
+### Assumptions and Limitations
+
+- **Different years across sources.** The USDA data is from 2020 (food) and 2021 (income/poverty), while the CDC data is from 2023. This 2–3 year gap is normal for combining public datasets, and structural things like fast food density and median income don't change fast, so the mismatch probably doesn't hurt the model much. Still worth mentioning.
+- **CDC PLACES values are modeled, not measured.** The obesity and diabetes numbers are statistical estimates from BRFSS survey data, not direct measurements of every resident.
+- **County-level data can't describe individuals.** A county with high predicted obesity doesn't mean any specific person there is obese.
+- **Lost about 21% of counties.** Counties with missing or suppressed data were dropped, which likely biases results toward larger, more urban counties that report more completely.
+- **Data vintage.** The model reflects the 2020–2023 window. Predictions shouldn't be assumed to hold for later years without re-training.
+
+### Data Understanding and Exploration
+
+Before modeling, I explored the cleaned dataset to understand the target variable, check for class balance, look at feature distributions, and see which features correlate most with obesity.
+
+### Creating the Binary Target
+
+I converted `CDC_OBESITY` into a binary target called `High_Obesity` using the national median of 38.0% as the cutoff:
+
+```python
+df["High_Obesity"] = (df["CDC_OBESITY"] > 38.0).astype(int)
+
+
