@@ -177,3 +177,124 @@ df["High_Obesity"] = (df["CDC_OBESITY"] > 38.0).astype(int)
 ```
 
 ### Data Preparation and Feature Selection
+
+### Missing Values
+
+Both source datasets use `-8888` and `-9999` as missing-value codes. I replaced those with `NaN` and dropped any row with a missing value. After cleaning, the final dataset has 2,468 counties with zero missing values in any column:
+FIPS 0
+State 0
+County 0
+FFRPTH20 0
+MEDHHINC21 0
+POVRATE21 0
+CDC_OBESITY 0
+CDC_DIABETES 0
+High_Obesity 0
+
+### Duplicates
+
+I checked for both duplicate rows and duplicate county IDs. There are no duplicate rows and no duplicate FIPS codes. Each county appears exactly once.
+
+### Feature Selection
+
+I selected four numeric features based on the exploration in Section 4:
+
+| Feature | Role in Model |
+|---|---|
+| `FFRPTH20` (fast food density) | Feature in Model 1 and Model 2 |
+| `MEDHHINC21` (median income) | Feature in Model 1 and Model 2 |
+| `POVRATE21` (poverty rate) | Feature in Model 1 and Model 2 |
+| `CDC_DIABETES` (diabetes prevalence) | Feature in Model 2 only |
+
+I dropped `State`, `County`, and `FIPS` before modeling because they are identifiers and not predictors. Including them could allow the model to learn specific locations instead of the patterns in the data. All of the features are numeric, so categorical encoding is not needed.
+
+I kept `CDC_DIABETES` separate instead of including it in both models. This allows me to compare two models:
+
+- **Model 1 features:** `FFRPTH20`, `MEDHHINC21`, `POVRATE21` (food environment and socioeconomic factors only)
+- **Model 2 features:** Model 1 features plus `CDC_DIABETES`
+
+Model 1 uses food environment and socioeconomic factors, while Model 2 adds diabetes prevalence. The goal is to see whether diabetes adds useful predictive information beyond the other factors.
+
+### Train/Test Split
+
+I used an 80/20 stratified split with `random_state=42. Stratification keeps the proportion of high-obesity and low-obesity counties similar in the training and testing sets.
+
+```python
+from sklearn.model_selection import train_test_split
+
+X = df[["FFRPTH20", "MEDHHINC21", "POVRATE21", "CDC_DIABETES"]]
+y = df["High_Obesity"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, stratify=y, random_state=42
+)
+```
+## Baseline and Model Development
+
+### Baseline
+
+Before training the models, I created a baseline using a majority-class classifier. This model does not use any of the features and predicts the most common class in the training data for every county. Since the two classes are close to a 50/50 split, this gives me a starting point for comparing the other models.
+
+The baseline had an accuracy of 0.506 and an F1 score of 0.000. The F1 score is 0.000 because the model never predicts the high-obesity class. This means the precision and recall for class 1 are both zero. The other models need to perform better than this baseline, especially on F1 and ROC-AUC.
+
+### Models Trained
+
+I trained three classification models using each of the two feature sets, giving me six models in total:
+
+- **Logistic Regression.** A linear model that predicts the probability of each class. It is also useful because the coefficients can be interpreted.
+- **Decision Tree.** A model that makes decisions by splitting the data based on feature values. It can capture non-linear relationships and is easy to visualize.
+- **Random Forest.** A model that combines multiple decision trees. It can work well with tabular data, but it is harder to interpret than one decision tree.
+
+I chose these three models because they give me different ways to approach the prediction problem. Logistic Regression tests a linear relationship, while the Decision Tree and Random Forest can capture more complex patterns.
+
+### Two Feature Sets
+
+I trained each model twice using two different feature sets:
+
+- **Model 1 features:** FFRPTH20, MEDHHINC21, POVRATE21 (food and socioeconomic features)
+- **Model 2 features:** Model 1 features plus CDC_DIABETES
+
+Model 1 uses food environment and socioeconomic features, while Model 2 adds diabetes prevalence. This allows me to see whether adding diabetes improves the model's predictions. I discuss the differences between the two feature sets in Section 9.
+
+### Hyperparameter Tuning
+
+I tuned each model using 5-fold cross-validation on the training data. The test data was not used during tuning so that it could be saved for the final evaluation. This helps prevent data leakage.
+
+Grids used:
+
+- **Logistic Regression:** C in [0.01, 0.1, 1, 10]
+- **Decision Tree:** max_depth in [3, 5, 7, None], min_samples_leaf in [1, 5, 10]
+- **Random Forest:** n_estimators in [100, 200], max_depth in [5, 10, None]
+
+Best parameters found:
+
+| Model | Best Parameters |
+|---|---|
+| LogReg Model 1 | C = 10 |
+| LogReg Model 2 | C = 10 |
+| Tree Model 1 | max_depth = 5, min_samples_leaf = 1 |
+| Tree Model 2 | max_depth = 5, min_samples_leaf = 5 |
+| RF Model 1 | n_estimators = 200, max_depth = 10 |
+| RF Model 2 | n_estimators = 200, max_depth = 5 |
+
+For Logistic Regression, C = 10 was selected for both feature sets. This means the model preferred less regularization within the values I tested. For the Decision Trees, max_depth = 5 was selected for both models, which helped keep the trees from becoming too complex.
+
+### Results
+
+| Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|---|---|---|---|---|---|
+| Baseline (majority) | 0.506 | 0.000 | 0.000 | 0.000 | 0.500 |
+| LogReg Model 1 | 0.706 | 0.691 | 0.734 | 0.712 | 0.780 |
+| LogReg Model 2 | 0.715 | 0.712 | 0.709 | 0.710 | 0.814 |
+| Tree Model 1 | 0.676 | 0.693 | 0.619 | 0.654 | 0.751 |
+| Tree Model 2 | 0.725 | 0.703 | 0.766 | 0.733 | 0.805 |
+| RF Model 1 | 0.700 | 0.698 | 0.693 | 0.695 | 0.782 |
+| RF Model 2 | 0.709 | 0.694 | 0.734 | 0.713 | 0.813 |
+
+All of the trained models performed better than the baseline. Accuracy increased from 0.506 to between 0.676 and 0.725. F1 increased from 0.000 to between 0.654 and 0.733. ROC-AUC also increased from 0.500 to between 0.751 and 0.814. This shows that the features provide useful information for predicting high-obesity counties.
+
+### Fair Comparison
+
+To make the comparison fair, I used the same train/test split for every model, with random_state = 42. I also used the same cross-validation setup when tuning the models. Each model was evaluated using the same test data, so the results can be compared directly.
+
+The main differences between the models are the algorithm and the features being used. The next section looks more closely at the results and explains why I selected the final model.
