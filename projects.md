@@ -96,7 +96,7 @@ Can we predict whether a U.S. county has above-median adult obesity prevalence u
 
 Project 1 showed that socioeconomic factors had stronger relationships with obesity than fast food density. Poverty had a correlation of r = 0.491, while median income had a correlation of r = -0.586. Fast food density had a much weaker correlation of r = -0.199. This project builds on those findings by moving from looking at relationships to making predictions. Instead of only asking whether obesity is related to poverty, I want to see whether a county's food environment, income, poverty, and diabetes prevalence can predict whether it falls into the high-obesity group. If the model performs well, it could help identify counties that may need more attention. If it does not perform well, or if diabetes is the main feature driving the predictions, that can also show the limits of using county-level data to predict obesity.
 
-### 2. Background and Context
+## 2. Background and Context
 
 Obesity is one of the major public health challenges in the United States. According to the National Center for Health Statistics, 40.3% of U.S. adults were classified as obese during the 2021–2023 period, while another 9.4% were classified as severely obese (Emmerich et al., 2024). Obesity can also increase the risk of health problems such as type 2 diabetes, cardiovascular disease, hypertension, and several types of cancer. The healthcare costs related to obesity are also high. Adults with obesity-related multimorbidity have higher healthcare use and costs, with costs that are 151% to 264% higher than for adults without these conditions (Ezendu et al., 2025). These costs also vary across the country. Obesity rates can differ based on factors such as location, income, and access to healthy food, which makes county-level prediction useful for understanding where obesity rates may be higher.
 
@@ -164,7 +164,7 @@ Both sources use `-8888` and `-9999` as missing-value codes. I replaced those wi
 - **Lost about 21% of counties.** Counties with missing or suppressed data were dropped, which likely biases results toward larger, more urban counties that report more completely.
 - **Data vintage.** The model reflects the 2020–2023 window. Predictions shouldn't be assumed to hold for later years without re-training.
 
-### 4. Data Understanding and Exploration
+## 4. Data Understanding and Exploration
 
 Before modeling, I explored the cleaned dataset to understand the target variable, check for class balance, look at feature distributions, and see which features correlate most with obesity.
 
@@ -176,7 +176,7 @@ I converted `CDC_OBESITY` into a binary target called `High_Obesity` using the n
 df["High_Obesity"] = (df["CDC_OBESITY"] > 38.0).astype(int)
 ```
 
-### 5. Data Preparation and Feature Selection
+## 5. Data Preparation and Feature Selection
 
 ### Missing Values
 
@@ -542,3 +542,83 @@ Anyone using this model should keep three things in mind:
 3. The model was trained on a specific window of data and should not be assumed to hold for other years without re-training.
 
 If these limits are understood, the model can be a useful starting point. If they are ignored, it could lead to resources going to the wrong places and too much trust in the predictions.
+
+## 10. Code and Transparency
+
+### Notebook and Code
+
+The full notebook for this project is on my GitHub portfolio. It has all of the data cleaning, exploration, modeling, and evaluation steps, and it runs top to bottom.
+
+**Notebook link:** [add your GitHub link here]
+
+The notebook includes:
+- USDA Excel data loading and sheet selection
+- CDC PLACES API pull via the Socrata endpoint
+- Merge on FIPS code
+- Missing value handling
+- Feature construction and target binarization
+- Exploratory visualizations
+- Model training, tuning, and evaluation
+
+### Dataset Citations
+
+**USDA Food Environment Atlas**
+U.S. Department of Agriculture Economic Research Service. (2025). *Food Environment Atlas*. https://www.ers.usda.gov/data-products/food-environment-atlas/
+
+**CDC PLACES**
+Centers for Disease Control and Prevention. (2023). *PLACES: Local data for better health*. U.S. Department of Health and Human Services. https://www.cdc.gov/places
+
+**CDC PLACES API**
+Data pulled live from `https://data.cdc.gov/resource/swc5-untb.json` with filters for `measureid=OBESITY` and `measureid=DIABETES`.
+
+### Sources Cited in the Project
+
+Abraham, A. M., Swartz, M. D., van den Berg, A. E., & Linder, S. H. (2026). Multilevel analysis of the food and physical activity environment and adult obesity across U.S. counties and states. *International Journal of Environmental Research and Public Health*, *23*(2), Article 142. https://doi.org/10.3390/ijerph23020142
+
+Emmerich, S. D., Fryar, C. D., Stierman, B., & Ogden, C. L. (2024). *Obesity and severe obesity prevalence in adults: United States, August 2021 to August 2023* (NCHS Data Brief No. 508). National Center for Health Statistics. https://doi.org/10.15620/cdc/159281
+
+Ezendu, K., Pohl, G., Lee, C. J., Wang, H., Li, X., & Dunn, J. P. (2025). Prevalence of obesity-related multimorbidity and its health care costs among adults in the United States. *Journal of Managed Care & Specialty Pharmacy*, *31*(2), 179–188. https://doi.org/10.18553/jmcp.2025.31.2.179
+
+### Tools and Libraries
+
+The analysis used:
+
+- **Python 3.13**
+- **pandas** for data handling
+- **numpy** for numerical operations
+- **matplotlib** and **seaborn** for visualizations
+- **requests** for the CDC Socrata API
+- **scikit-learn** for modeling (Logistic Regression, Decision Tree, Random Forest, GridSearchCV, StandardScaler)
+
+### AI Usage Disclosure
+
+In accordance with the course policy, I am disclosing how generative AI tools were used in this project.
+
+**Tool used:** Claude (Anthropic) via the web interface.
+
+**Purposes:**
+- Debugging Python errors during the notebook setup (for example, the missing scikit-learn install)
+- Reviewing the structure of the project sections against the assignment rubric
+- Providing feedback on the clarity of my write-ups
+
+**What I did myself:**
+- All data collection and cleaning decisions
+- All code execution and verification
+- All modeling choices (which models, which features, which hyperparameters)
+- All interpretation of results
+- All final writing and edits
+
+AI was used as a supporting tool for debugging, organization, feedback, and rewording some of the write-up. It did not run the analysis or produce any of the results. The numbers and findings come from my own code and data.
+
+### Reproducibility
+
+To reproduce this project:
+
+1. Request a Census API key from `https://api.census.gov/data/key_signup.html` (only needed if pulling census data; CDC PLACES API does not require a key)
+2. Download the USDA Food Environment Atlas from `https://www.ers.usda.gov/data-products/food-environment-atlas/`
+3. Run the notebook top to bottom with `random_state=42` fixed everywhere
+4. Results should match the tables in Sections 6, 7, and 8
+
+### Final Note
+
+The project represents my own work and analysis. Any errors or gaps are my own. The AI disclosure above reflects the actual use of tools during this project.
