@@ -460,3 +460,85 @@ Several things cannot be concluded from this model:
 ### Main Takeaway
 
 The final model does reasonably well, with an F1 of 0.733 and an accuracy of 0.725. But most of that comes from one feature, diabetes prevalence. That makes me wonder whether this model is useful for public health planning, or whether it just labels counties that were already known to have health problems. I look at this more in Section 9.
+
+## 9. Limitations, Ethics, and Reflection
+
+### Dataset Limitations
+
+Every dataset has gaps. These are the ones that matter most for how this model should be used.
+
+**Modeled estimates, not measurements.** The CDC PLACES obesity and diabetes values are estimates built from BRFSS survey data and modeling. They are not direct measurements of every resident. PLACES also reports confidence intervals for these estimates, but I did not use them in this analysis. That means the real obesity rate in a county could be different from the number the model sees.
+
+**Different years across sources.** The USDA food environment data is from 2020, the income and poverty data is from 2021, and the CDC health data is from 2023. There is a gap of 2 to 3 years between the oldest and newest variables. Things like fast food density change slowly, so this probably isn't a big problem, but I can't say it has no effect.
+
+**Lost about 21% of counties.** The final dataset has 2,468 of the roughly 3,144 U.S. counties. Counties with missing or suppressed data were dropped. These drops probably aren't random. Small, rural counties are more likely to have missing values, so the model is likely trained mostly on larger, more urban counties. Its predictions for smaller counties may be less reliable.
+
+**Only four features.** The model has four predictors, and Model 1 only has three. That is not many for something as complicated as county-level obesity. Things like age, physical activity, food culture, and local health care access are not in the model.
+
+**County-level data.** Each row is a county, not a person. The model can't say anything about individual behavior. This is the ecological fallacy, and I think it is the biggest limit on how the results can be interpreted.
+
+### Sources of Bias
+
+Several biases could affect the results:
+
+1. **Reporting bias.** Counties with more complete data are more likely to be in the final dataset. These counties are probably larger and more urban, so the model may reflect patterns from those places more than from others.
+2. **Survey bias.** BRFSS is a phone survey and the answers are self-reported. People who answer surveys may not represent everyone in a county.
+3. **Feature selection bias.** I chose which features to include. Someone else might have picked different ones and gotten different results.
+4. **Median cutoff bias.** I used 38.0% as the cutoff, which is the median of the counties left after cleaning. That was my decision. A different cutoff, like 40% or the 75th percentile, would change the labels and might change which model performs best.
+5. **Historical bias in the data.** Obesity and diabetes rates are shaped by long-term policy, economics, and inequality. The model picks up the results of those things but not the causes.
+
+### Consequences of Prediction Errors
+
+The model makes two kinds of mistakes, and they have different consequences.
+
+**False positives (79 counties).** A low-obesity county gets flagged as high-obesity. If a health department used the model to decide where to send resources, this county might get money it doesn't need. The cost is wasted resources, and the county could also be mislabeled.
+
+**False negatives (57 counties).** A high-obesity county gets missed. I think this is the more serious error. A county with real health needs wouldn't be flagged, so it might not get the support it needs.
+
+Which error matters more depends on the goal. If the goal is to reach every high-risk county, recall matters most, and missing 57 counties is a lot. If the goal is to use limited funding carefully, precision matters more, and 79 false alarms is a problem. The model balances the two with an F1 of 0.733, but it doesn't fully meet either goal.
+
+### The Diabetes Problem
+
+I think the diabetes feature is the biggest issue in this project.
+
+CDC_DIABETES makes up 81.4% of the final tree's feature importance. Without it, the best tree (Tree Model 1) had an F1 of 0.654, compared to 0.733 with it. So diabetes is doing most of the work.
+
+This creates two problems:
+
+1. **Clinical overlap.** Obesity and diabetes are closely linked, so using one to predict the other is basically predicting a health outcome from a related health outcome. The poverty, income, and fast food features from Project 1 matter much less once diabetes is included.
+
+2. **Real-world usefulness.** If a health department already knows which counties have high diabetes, it may not need a model to tell it which counties have high obesity. The model might mostly flag counties that are already known to have health problems. I didn't test this, so I can't say for sure.
+
+There is one possible counterargument. Diabetes data might be available before updated obesity estimates are. If so, diabetes could work as an early signal. But that is a narrow case, and it doesn't change the main problem.
+
+### Should This Model Be Used in the Real World?
+
+Probably not as a standalone decision tool. These are my reasons:
+
+- **Too few features.** Four predictors is not enough for something this complicated.
+- **Diabetes dominance.** The model mostly relabels counties based on diabetes instead of finding new patterns.
+- **Ecological fallacy.** County-level predictions can't be used to make decisions about individuals.
+- **Dropped counties.** 21% of counties are missing, and they probably aren't missing at random.
+- **Static model.** The data covers 2020 to 2023, so the model would need to be retrained for later years.
+
+The model could still be useful as one input among many. An analyst could use it to flag counties for a closer look, but not to make final funding decisions. It could also be a starting point for a better model with more features and more local context.
+
+### What I Would Do Next
+
+If I kept working on this project, I would do three things:
+
+1. **Drop diabetes and rebuild.** Without diabetes, the model would have to rely on income, poverty, and food environment features alone. That would show whether those features can predict obesity by themselves, or whether diabetes was covering up their signal.
+2. **Add more features.** The USDA Food Environment Atlas and CDC PLACES both have more variables, such as SNAP participation, grocery store access, and physical inactivity. I would check which ones are available at the county level and add them.
+3. **Test different cutoffs.** Instead of the median, I would try the 75th percentile or a clinical cutoff like 40%. This would show how much the results depend on how I defined the classes.
+
+I would also try a regression model that predicts the actual obesity rate instead of a high or low label. That would remove the cutoff problem completely.
+
+### What Users Should Understand
+
+Anyone using this model should keep three things in mind:
+
+1. The model predicts county-level obesity mostly from diabetes prevalence. It is not finding new risk factors.
+2. The predictions are about counties, not people.
+3. The model was trained on a specific window of data and should not be assumed to hold for other years without re-training.
+
+If these limits are understood, the model can be a useful starting point. If they are ignored, it could lead to resources going to the wrong places and too much trust in the predictions.
