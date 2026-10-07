@@ -298,3 +298,85 @@ All of the trained models performed better than the baseline. Accuracy increased
 To make the comparison fair, I used the same train/test split for every model, with random_state = 42. I also used the same cross-validation setup when tuning the models. Each model was evaluated using the same test data, so the results can be compared directly.
 
 The main differences between the models are the algorithm and the features being used. The next section looks more closely at the results and explains why I selected the final model.
+
+## Model Evaluation and Selection
+
+### Metrics Used
+
+I evaluated each model using five different metrics. Each metric shows a different part of how well the model performed.
+
+**Accuracy** is the percentage of predictions the model got correct. It is easy to understand, but it can be misleading when the classes are unbalanced. Since the two classes in this dataset are close to 50/50, accuracy is useful for this project.
+
+**Precision** shows how often the model is correct when it predicts that a county has high obesity. A higher precision means fewer false positives.
+
+**Recall** shows how many of the counties that actually have high obesity the model was able to identify. A higher recall means fewer high-obesity counties were missed.
+
+**F1** combines precision and recall into one score. It gives a balance between the two, so both types of errors are taken into account.
+
+**ROC-AUC** measures how well the model separates high-obesity counties from other counties across different thresholds. A higher ROC-AUC means the model is better at separating the two classes.
+
+I used F1 as the main metric during hyperparameter tuning because both false positives and false negatives matter in this project. A false negative means that a high-obesity county is missed, while a false positive means that a county is incorrectly flagged as high obesity. F1 gives a balance between these two types of errors.
+
+### How Each Model Performed
+
+| Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|---|---|---|---|---|---|
+| Baseline (majority) | 0.506 | 0.000 | 0.000 | 0.000 | 0.500 |
+| LogReg Model 1 | 0.706 | 0.691 | 0.734 | 0.712 | 0.780 |
+| LogReg Model 2 | 0.715 | 0.712 | 0.709 | 0.710 | 0.814 |
+| Tree Model 1 | 0.676 | 0.693 | 0.619 | 0.654 | 0.751 |
+| Tree Model 2 | 0.725 | 0.703 | 0.766 | 0.733 | 0.805 |
+| RF Model 1 | 0.700 | 0.698 | 0.693 | 0.695 | 0.782 |
+| RF Model 2 | 0.709 | 0.694 | 0.734 | 0.713 | 0.813 |
+
+All of the trained models performed better than the baseline. Accuracy increased from 0.506 to between 0.676 and 0.725. F1 increased from 0.000 to between 0.654 and 0.733. ROC-AUC also increased from 0.500 to between 0.751 and 0.814. This shows that the features provide useful information for predicting high-obesity counties.
+
+### Model 1 vs. Model 2
+
+Adding diabetes helped every model, but not by much:
+
+| Model Pair | F1 Change | ROC-AUC Change |
+|---|---|---|
+| LogReg | 0.712 to 0.710 (flat) | 0.780 to 0.814 (+0.034) |
+| Tree | 0.654 to 0.733 (+0.079) | 0.751 to 0.805 (+0.054) |
+| RF | 0.695 to 0.713 (+0.018) | 0.782 to 0.813 (+0.031) |
+
+The biggest change was with the Decision Tree. Adding diabetes increased its F1 score from 0.654 to 0.733 and its ROC-AUC from 0.751 to 0.805. Logistic Regression had almost no change in F1, but its ROC-AUC increased from 0.780 to 0.814. This suggests that the tree models were better able to use the diabetes feature to make predictions.
+
+### Final Model: Tree Model 2
+
+I selected **Tree Model 2** as the final model. It uses a Decision Tree Classifier trained on FFRPTH20, MEDHHINC21, POVRATE21, and CDC_DIABETES, with max_depth = 5 and min_samples_leaf = 5.
+
+Reasons for choosing it:
+
+1. **Best F1 score (0.733).** F1 was my main metric during tuning, and Tree Model 2 had the highest F1 score.
+2. **Best accuracy (0.725).** It had the highest accuracy of all the models.
+3. **Best recall (0.766).** It identified the most counties that actually had high obesity.
+4. **Strong ROC-AUC (0.805).** It was not the highest ROC-AUC, but the difference from the highest score of 0.814 was small.
+
+### Tradeoff: Tree Model 2 vs. LogReg Model 2
+
+LogReg Model 2 had the highest ROC-AUC at 0.814. This means it was slightly better at separating the two classes across different thresholds. If the goal were to rank counties based on their predicted risk, LogReg Model 2 could be a good choice.
+
+However, I used F1 as my main metric because I am more interested in making accurate classifications. Tree Model 2 had a higher F1 score, accuracy, and recall. It also identified more of the counties that actually had high obesity.
+
+### Tradeoff: Tree Model 2 vs. RF Model 2
+
+Random Forest did not perform better than the single Decision Tree in this project. RF Model 2 had an F1 score of 0.713 and an accuracy of 0.709, while Tree Model 2 had an F1 score of 0.733 and an accuracy of 0.725.
+
+One possible reason is the size of the dataset. There are fewer than 2,000 counties in the training data, so a single tuned tree can still perform well. Another possible reason is the hyperparameter settings. GridSearchCV selected max_depth = 5 and min_samples_leaf = 5 for Tree Model 2, while the Random Forest grid did not include min_samples_leaf.
+
+This shows that a more complex model is not always better. In this case, the single Decision Tree performed better than the Random Forest on the main metrics I used.
+
+### Summary of Selection Decision
+
+| Criterion | Winner |
+|---|---|
+| Accuracy | Tree Model 2 (0.725) |
+| F1 | Tree Model 2 (0.733) |
+| Recall | Tree Model 2 (0.766) |
+| ROC-AUC | LogReg Model 2 (0.814) |
+| Interpretability | Tree Model 2 (single tree is easy to visualize) |
+
+Tree Model 2 performed best on four of the five criteria, while LogReg Model 2 had the highest ROC-AUC. Based on the F1 score, accuracy, recall, and interpretability, I selected Tree Model 2 as the final model.
+
