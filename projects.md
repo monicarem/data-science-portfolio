@@ -175,6 +175,4 @@ I converted `CDC_OBESITY` into a binary target called `High_Obesity` using the n
 ```python
 df["High_Obesity"] = (df["CDC_OBESITY"] > 38.0).astype(int)
 
-
-
-Tree Model 2 performed best on four of the five criteria, while LogReg Model 2 had the highest ROC-AUC. Based on the F1 score, accuracy, recall, and interpretability, I selected Tree Model 2 as the final model.
+### Data Preparation and Feature Selection
