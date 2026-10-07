@@ -174,5 +174,6 @@ I converted `CDC_OBESITY` into a binary target called `High_Obesity` using the n
 
 ```python
 df["High_Obesity"] = (df["CDC_OBESITY"] > 38.0).astype(int)
+```
 
 ### Data Preparation and Feature Selection
